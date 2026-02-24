@@ -108,7 +108,15 @@ docker run -p 3000:3000 git-study
 
 ## GitHub Actions セットアップ
 
-PR to develop時のDocker image pushで「Username and password required」エラーが出る場合、以下の手順でGitHub Secretsを設定してください。
+### 0. リポジトリの設定を変更する（推奨）
+
+release-please が Release PR を作成するには、`GITHUB_TOKEN` に PR 作成権限が必要です。以下の手順で設定してください。
+
+1. リポジトリの **Settings** → **Actions** → **General**
+2. **Workflow permissions** で **Read and write permissions** を選択
+3. **Save** をクリック
+
+> `GitHub Actions is not permitted to create or approve pull requests` エラーが出る場合は、この設定が必要です。
 
 ### 1. Docker Hub でアクセストークンを作成
 
