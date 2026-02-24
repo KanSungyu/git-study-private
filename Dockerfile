@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 
 # ビルド時のパラメータ（検証環境/本番で異なる値を指定可能）
 ARG BUILD_ENV=production
@@ -14,7 +14,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine AS runner
+FROM node:25-alpine AS runner
 
 WORKDIR /app
 
