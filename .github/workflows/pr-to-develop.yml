@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - develop
-    types: [opened, synchronize, reopened, closed]
+    types: [opened, synchronize, reopened]
   push:
     branches:
       - develop
@@ -14,12 +14,12 @@ env:
 
 jobs:
   build-and-push:
-    # PR closed 時はビルドしない（delete-branch-tag ジョブでタグ削除のみ実行）
     if: github.event_name != 'pull_request' || github.event.action != 'closed'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
+      pull-requests: read
 
     steps:
       - name: Checkout repository
@@ -38,11 +38,9 @@ jobs:
         id: tag
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
-            # develop への push（マージ含む）→ stg タグ
             echo "tag=stg" >> $GITHUB_OUTPUT
             echo "Event: push to develop -> tag: stg"
           else
-            # PR 時 → ブランチ名をタグに（fix/ui-error -> fix-ui-error）
             BRANCH_NAME="${{ github.head_ref }}"
             if [ -z "$BRANCH_NAME" ]; then
               BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
@@ -61,35 +59,39 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  delete-branch-tag:
-    # Squash and merge 含む、PR マージ時にブランチ名タグを削除
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Delete branch tag from Docker Hub
+      - name: Delete branch tag (on merge to develop)
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # PR の head ref からブランチ名を取得（Squash and merge でも利用可能）
-          BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-          BRANCH_TAG=$(echo "$BRANCH_NAME" | tr '/' '-')
+          # マージコミットから GitHub API で PR を取得し、ブランチ名を取得
+          COMMIT_SHA="${{ github.sha }}"
+          REPO="${{ github.repository }}"
+          PR_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/${REPO}/commits/${COMMIT_SHA}/pulls")
 
-          if [ -z "$BRANCH_TAG" ] || [ "$BRANCH_TAG" = "stg" ]; then
-            echo "Skipping tag deletion"
+          BRANCH_NAME=$(echo "$PR_JSON" | jq -r '.[0].head.ref // empty')
+          if [ -z "$BRANCH_NAME" ]; then
+            echo "Could not get branch from PR, skipping tag deletion"
+            exit 0
+          fi
+
+          BRANCH_TAG=$(echo "$BRANCH_NAME" | tr '/' '-')
+          if [ "$BRANCH_TAG" = "stg" ]; then
+            echo "Skipping deletion of stg tag"
             exit 0
           fi
 
           echo "Deleting tag: kansungyu/git-study:$BRANCH_TAG"
 
-          TOKEN=$(curl -s -X POST "https://hub.docker.com/v2/users/login/" \
+          DOCKER_TOKEN=$(curl -s -X POST "https://hub.docker.com/v2/users/login/" \
             -H "Content-Type: application/json" \
             -d "{\"username\":\"kansungyu\",\"password\":\"${{ secrets.DOCKERHUB_TOKEN }}\"}" \
             | jq -r .token)
 
-          if [ -n "$TOKEN" ] && [ "$TOKEN" != "null" ]; then
+          if [ -n "$DOCKER_TOKEN" ] && [ "$DOCKER_TOKEN" != "null" ]; then
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
-              -H "Authorization: JWT $TOKEN" \
+              -H "Authorization: JWT $DOCKER_TOKEN" \
               "https://hub.docker.com/v2/repositories/kansungyu/git-study/tags/${BRANCH_TAG}/")
             if [ "$HTTP_CODE" = "204" ]; then
               echo "Tag $BRANCH_TAG deleted successfully"
