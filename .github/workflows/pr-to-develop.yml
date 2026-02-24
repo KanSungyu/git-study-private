@@ -48,8 +48,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            kansungyu/git-study:${{ steps.branch.outputs.tag }}
-            kansungyu/git-study:${{ steps.branch.outputs.tag }}-${{ github.sha }}
+          tags: kansungyu/git-study:${{ steps.branch.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
