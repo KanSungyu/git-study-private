@@ -1,4 +1,4 @@
-name: Docker Build - Green (本番相当検証環境)
+name: Docker Build - Green
 
 on:
   pull_request:
