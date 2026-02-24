@@ -48,6 +48,19 @@ npm run dev
 
 http://localhost:3000 でアプリケーションが起動します。
 
+### ユニットテスト
+
+```bash
+# テストを1回実行
+npm test
+
+# ウォッチモード（ファイル変更時に自動再実行）
+npm run test:watch
+
+# カバレッジ付きで実行
+npm run test:coverage
+```
+
 ### Dockerで実行
 
 ```bash
