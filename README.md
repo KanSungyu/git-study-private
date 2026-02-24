@@ -41,6 +41,12 @@ Git workflow勉強会用のリポジトリです。Next.js 16のサンプルア�
    - Docker Hub (`kansungyu/git-study`) にプッシュ
    - タグはブランチ名をスラッシュ→ハイフンに変換したもの（例: `fix/ui-error` → `fix-ui-error`）
 
+6. **develop にマージ**（Squash and merge 推奨）されると、以下を実行：
+   - `kansungyu/git-study:stg` タグでイメージをビルド・プッシュ
+   - PR時に作成したブランチ名タグ（例: `fix-ui-error`）を削除
+
+> Squash and merge でも Create a merge commit でも、どちらのマージ方法でも動作します。
+
 ## セットアップ
 
 ### 必要な環境
