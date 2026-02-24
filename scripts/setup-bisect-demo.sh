@@ -23,10 +23,12 @@ echo "bisect-demo ブランチを作成し、ログイン不正バグのデモ�
 git checkout -b bisect-demo
 
 # コミット1: 認証のテストを追加
+# ※ 親ブランチと同一だと commit できないため、コメントを追加
 cat > src/lib/auth.test.ts << 'EOF'
 import { describe, it, expect } from "vitest";
 import { validateCredentials } from "./auth";
 
+// bisect デモ用
 describe("validateCredentials", () => {
   it("正しいパスワードではログインできる", () => {
     const user = validateCredentials("admin", "password123");
