@@ -91,7 +91,9 @@ npm run test:watch
 npm run test:coverage
 ```
 
-**push 前に自動でテスト実行**: [husky](https://typicode.github.io/husky/) の pre-push フックで、`git push` の直前に `npm test` が自動実行されます。テストが失敗すると push はブロックされます。テストを忘れずに実行するための仕組みです。
+**push 前に自動でテスト実行**: [husky](https://typicode.github.io/husky/) の pre-push フックで、`git push` の直前に `npm test` が自動実行されます。テストが失敗すると push はブロックされます。
+
+> フックが動かない場合: `npm install` または `npm run prepare` を実行して husky を初期化してください。`core.hooksPath` が `.husky/_` に設定されます。
 
 ### Dockerで実行
 
