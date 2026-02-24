@@ -49,10 +49,12 @@ git add src/lib/auth.test.ts
 git commit -m "test: 認証のテストを追加"
 
 # コミット2: コメント追加（まだバグなし）
+# ※ 親ブランチと内容が同じだと commit できないため、説明コメントを追加
 cat > src/lib/auth.ts << 'EOF'
 /**
  * サンプル用の簡易認証ユーティリティ
  * 本番環境では適切な認証バックエンドを使用してください
+ * (bisect デモ用コミット2)
  */
 
 const AUTH_STORAGE_KEY = "git-study-auth";
