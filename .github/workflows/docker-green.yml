@@ -1,0 +1,43 @@
+name: Docker Build - Green (本番相当検証環境)
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+env:
+  REGISTRY: docker.io
+
+jobs:
+  build-green:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: kansungyu
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push green image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: kansungyu/git-study:green
+          # 検証環境用のビルドパラメータ（必要に応じて追加）
+          # 例: NEXT_PUBLIC_API_URL など本番と異なる値を指定する場合は build-args に追加
+          build-args: |
+            BUILD_ENV=green
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

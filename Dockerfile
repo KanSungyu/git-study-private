@@ -1,6 +1,10 @@
 # Build stage
 FROM node:20-alpine AS builder
 
+# ビルド時のパラメータ（検証環境/本番で異なる値を指定可能）
+ARG BUILD_ENV=production
+ENV BUILD_ENV=${BUILD_ENV}
+
 WORKDIR /app
 
 COPY package.json package-lock.json* ./

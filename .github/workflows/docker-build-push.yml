@@ -55,5 +55,7 @@ jobs:
           context: .
           push: true
           tags: kansungyu/git-study:${{ steps.tag.outputs.tag }}
+          build-args: |
+            BUILD_ENV=develop
           cache-from: type=gha
           cache-to: type=gha,mode=max

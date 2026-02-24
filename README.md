@@ -47,8 +47,18 @@ Git workflow勉強会用のリポジトリです。Next.js 16のサンプルア�
 
 | ファイル | 用途 |
 |----------|------|
+| `release-please.yml` | main への push 時に [release-please](https://github.com/googleapis/release-please) が Release PR を作成。マージでタグ・GitHub Release を自動作成 |
 | `docker-build-push.yml` | develop への PR / push 時に Docker イメージをビルド・Docker Hub にプッシュ |
+| `docker-green.yml` | main への PR 時に `green` タグでイメージをビルド（Blue/Green の検証環境用。`build-args` で本番と異なるパラメータを指定可能） |
 | `pr-conventional-commits.yml` | PR タイトルが [Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/) 形式かチェック |
+
+### リリースフロー（release-please）
+
+1. develop を main にマージ（feat/fix コミットを含む）
+2. release-please が Release PR（例: `chore(main): release 1.1.0`）を自動作成
+3. Release PR をマージすると、タグと GitHub Release が作成される
+
+**バージョンルール（SemVer）**: fix=patch, feat=minor, BREAKING CHANGE=major
 
 PR タイトルは `feat: 説明` や `fix(auth): 説明` のような形式にしてください。
 
@@ -80,6 +90,8 @@ npm run test:watch
 # カバレッジ付きで実行
 npm run test:coverage
 ```
+
+**push 前に自動でテスト実行**: [husky](https://typicode.github.io/husky/) の pre-push フックで、`git push` の直前に `npm test` が自動実行されます。テストが失敗すると push はブロックされます。テストを忘れずに実行するための仕組みです。
 
 ### Dockerで実行
 
