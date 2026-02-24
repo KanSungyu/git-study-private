@@ -1,0 +1,41 @@
+name: PR Conventional Commits Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  check-pr-title:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+
+    steps:
+      - name: Check PR title format
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          # Conventional Commits形式: <type>[optional scope]: <description>
+          # 型: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+          # スコープ: 任意、括弧内
+          # 破壊的変更: 型/スコープの直後に ! を付けてもよい
+          # 参考: https://www.conventionalcommits.org/ja/v1.0.0/
+          # 型は大文字小文字を区別しない（Conventional Commits仕様）
+          if echo "$PR_TITLE" | grep -qiE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-zA-Z0-9-]+\))?!?: .+'; then
+            echo "✅ PRタイトルはConventional Commits形式に準拠しています: $PR_TITLE"
+          else
+            echo "❌ PRタイトルがConventional Commits形式に準拠していません"
+            echo ""
+            echo "現在のタイトル: $PR_TITLE"
+            echo ""
+            echo "正しい形式: <type>[optional scope]: <description>"
+            echo ""
+            echo "例:"
+            echo "  feat: 新機能を追加"
+            echo "  fix: バグを修正"
+            echo "  feat(auth): ログイン機能を追加"
+            echo "  docs: READMEを更新"
+            echo ""
+            echo "使用可能な型: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+            echo "詳細: https://www.conventionalcommits.org/ja/v1.0.0/"
+            exit 1
+          fi
