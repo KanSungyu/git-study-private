@@ -4,21 +4,24 @@ on:
   pull_request:
     branches:
       - main
-    types: [opened, synchronize, reopened]
 
 env:
   REGISTRY: docker.io
 
 jobs:
   build-green:
+    # main への PR 時
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
+      pull-requests: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -35,8 +38,6 @@ jobs:
           context: .
           push: true
           tags: kansungyu/git-study:green
-          # 検証環境用のビルドパラメータ（必要に応じて追加）
-          # 例: NEXT_PUBLIC_API_URL など本番と異なる値を指定する場合は build-args に追加
           build-args: |
             BUILD_ENV=green
           cache-from: type=gha
