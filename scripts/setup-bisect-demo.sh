@@ -216,6 +216,15 @@ git commit -m "docs: モジュール説明を追加"
 echo ""
 echo "✅ セットアップ完了！"
 echo ""
+echo "【動作確認】"
+if grep -q "user.password === password" src/lib/auth.ts; then
+  echo "⚠️ 警告: auth.ts にパスワードチェックが含まれています。想定と異なります。"
+else
+  echo "✓ バグありの実装です。admin / wrongpassword でログインできるはずです。"
+  echo "  npm run dev を起動し、http://localhost:3000/login で確認してください。"
+  echo "  ※ 既に dev サーバーが動いている場合は再起動してください。"
+fi
+echo ""
 echo "【GUIで確認する方法】"
 echo "  npm run dev で起動し、http://localhost:3000/login にアクセス"
 echo "  - 良いコミット: admin / wrongpassword → エラー表示（正しい動作）"

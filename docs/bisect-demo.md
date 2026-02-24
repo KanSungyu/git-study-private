@@ -13,8 +13,12 @@
 作業ツリーをクリーンな状態にしてから、以下を実行してください。
 
 ```bash
+# bisect-demo が既にある場合は削除してから実行
+git branch -D bisect-demo
 ./scripts/setup-bisect-demo.sh
 ```
+
+> ⚠️ **重要**: 既存の `bisect-demo` ブランチがあると、スクリプトは実行されません。以前デモしたことがある場合は `git branch -D bisect-demo` で削除してから再実行してください。
 
 これにより `bisect-demo` ブランチが作成され、以下のようなコミット履歴が作られます。
 
