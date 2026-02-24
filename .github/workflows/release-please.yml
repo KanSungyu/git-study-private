@@ -1,4 +1,7 @@
-name: Release Please
+name: release-please
+
+env:
+  IMAGE_NAME: kansungyu/git-study
 
 on:
   push:
@@ -13,7 +16,47 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v4
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
+          package-name: git-study
+
+      - name: Set TAG from release-please
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          echo "Release Tag - ${{ steps.release.outputs.tag_name }}"
+          if [ -n "${{ steps.release.outputs.tag_name }}" ]; then
+            echo "TAG=${{ steps.release.outputs.tag_name }}" >> $GITHUB_ENV
+          else
+            echo "TAG=latest" >> $GITHUB_ENV
+          fi
+
+      - name: Checkout for tag created
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
+
+      - name: Docker meta for tag created
+        if: ${{ steps.release.outputs.release_created }}
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+
+      - name: Login to DockerHub for tag created
+        if: ${{ steps.release.outputs.release_created }}
+        uses: docker/login-action@v3
+        with:
+          username: kansungyu
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push for tag created
+        if: ${{ steps.release.outputs.release_created }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          labels: ${{ steps.meta.outputs.labels }}
