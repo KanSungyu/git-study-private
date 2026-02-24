@@ -66,6 +66,16 @@ Git workflow勉強会用のリポジトリです。Next.js 16のサンプルア�
 
 PR タイトルは `feat: 説明` や `fix(auth): 説明` のような形式にしてください。
 
+### git bisect デモ
+
+どのコミットでバグが入ったかを二分探索で特定する `git bisect` のデモシナリオを用意しています。
+
+```bash
+./scripts/setup-bisect-demo.sh   # デモ用ブランチ・コミット履歴を作成
+```
+
+詳細な手順は [docs/bisect-demo.md](docs/bisect-demo.md) を参照してください。
+
 ## セットアップ
 
 ### 必要な環境
