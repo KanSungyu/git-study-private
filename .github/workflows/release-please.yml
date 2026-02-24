@@ -36,7 +36,7 @@ jobs:
 
       - name: Checkout for tag created
         if: ${{ steps.release.outputs.release_created }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Docker meta for tag created
         if: ${{ steps.release.outputs.release_created }}
