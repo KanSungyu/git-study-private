@@ -76,9 +76,29 @@ docker run -p 3000:3000 git-study
 
 ## GitHub Actions セットアップ
 
-PR to develop時のDocker image pushには、以下のGitHub Secretsの設定が必要です：
+PR to develop時のDocker image pushで「Username and password required」エラーが出る場合、以下の手順でGitHub Secretsを設定してください。
 
-- `DOCKERHUB_USERNAME`: Docker Hubのユーザー名
-- `DOCKERHUB_TOKEN`: Docker Hubのアクセストークン（Personal Access Token）
+### 1. Docker Hub でアクセストークンを作成
 
-[Docker Hub](https://hub.docker.com/settings/security) でアクセストークンを作成し、GitHubリポジトリの Settings → Secrets and variables → Actions に追加してください。
+1. [Docker Hub](https://hub.docker.com/) にログイン
+2. 右上のアカウントメニュー → **Account Settings** → **Security** → **New Access Token**
+3. トークン名（例: `github-actions`）を入力し、**Read & Write** 権限で作成
+4. 表示されたトークンをコピー（再表示できないため、この時点で控えておく）
+
+> ⚠️ **注意**: `DOCKERHUB_TOKEN` には **パスワードではなくアクセストークン** を使用してください。
+
+### 2. GitHub に Secrets を追加
+
+1. リポジトリの **Settings** → **Secrets and variables** → **Actions**
+2. **New repository secret** をクリック
+3. 以下を追加：
+
+| Secret 名 | 値 |
+|-----------|-----|
+| `DOCKERHUB_TOKEN` | 上記で作成したアクセストークン |
+
+※ ユーザー名（`kansungyu`）は workflow 内で指定済みのため、Secrets への登録は不要です。
+
+### 3. フォークからの PR について
+
+**同じリポジトリ内のブランチ**からの PR では Secrets が利用されますが、**フォーク（他リポジトリ）からの PR** ではセキュリティのため Secrets が渡されません。その場合、この workflow の Docker push は失敗します。フォークからの PR を想定する場合は、workflow のトリガーを `push` に変更するなどの対応が必要です。
