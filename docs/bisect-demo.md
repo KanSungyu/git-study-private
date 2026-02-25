@@ -61,7 +61,7 @@ git bisect start
 git bisect bad                 # 現在の HEAD はバグあり
 git bisect good HEAD~3         # 3つ前のコミットはバグなし
 ```
-
+ss
 ### 3. 各ステップでテストを実行
 
 bisect が自動で中間のコミットにチェックアウトします。各ステップで以下を実行してください。
