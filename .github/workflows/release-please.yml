@@ -47,7 +47,7 @@ jobs:
 
       - name: Login to DockerHub for tag created
         if: ${{ steps.release.outputs.release_created }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: kansungyu
           password: ${{ secrets.DOCKERHUB_TOKEN }}
